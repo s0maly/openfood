@@ -1,0 +1,32 @@
+import React, { Component } from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Header from './Components/Header';
+import Home from './Components/Home';
+import Login from './Components/Login';
+import Register from './Components/Register';
+
+class App extends Component{
+  constructor() {
+    super();
+    this.state = {
+      name: 'React'
+    };
+  }
+  render() {
+    return (
+      <Router>
+        <div>
+          <Header />
+          <Routes>
+            <Route exact path="/" element={<Home/>} />
+            <Route path="/login" element={<Login/>} />
+            <Route path="/register" element={<Register/>} />
+          </Routes>
+        </div>
+      </Router>
+    );
+  }
+}
+
+render(<App />, document.getElementById('root'));
