@@ -1,0 +1,15 @@
+pip3 install djangorestframework
+pip install django-cors-headers //apparement on peut utiliser pipenv pour que ce soit dans l'env
+
+
+
+NotImplementedError: Database objects do not implement truth value testing or bool(). Please compare with None instead: database is not None
+(venv) PS C:\Users\ianka\OneDrive\IMIE\BigData\projets\openfood> pip install pymongo==3.12.3
+
+==>pip install pymongo==3.12.3
+
+
+Faire des migration db
+py manage.py makemigrations app
+
+

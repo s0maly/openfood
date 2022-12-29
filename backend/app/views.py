@@ -1,3 +1,6 @@
+import base64
+import time
+
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
@@ -10,18 +13,27 @@ from app.serializer import ProductSerializer, CategorySerializer, UserSerializer
 @csrf_exempt
 def userApi(request, id=0):
     if request.method == 'GET':
+        if id != 0:
+            userData = JSONParser().parse(request)
+            user = User.objects.get(user_id=id)
+            userSerialized = UserSerializer(user, data=userData)
+            if userSerialized.is_valid():
+                return JsonResponse(userSerialized.data, safe=False)
+            else:
+                return JsonResponse('Failed', safe=False)
         users = User.objects.all()
         usersSerialized = UserSerializer(users, many=True)
-        # Safe pour indiquer une tentative de conversion en format JSON, au cas ou ça passe
+
+        # Safe pour indiquer une tentative de conversion en format JSON, au cas ou ça passe  str(year)
         return JsonResponse(usersSerialized.data, safe=False)
     elif request.method == 'POST':
         userData = JSONParser().parse(request)
+        userData['token'] = str(time.time())
         userData['password'] = make_password(userData['password'])
         userSerialized = UserSerializer(data=userData)
         if userSerialized.is_valid():
-
             userSerialized.save()
-            return JsonResponse('Success', safe=False)
+            return JsonResponse('{token:' + userData['token'] + '}', safe=False)
         return JsonResponse('Failed', safe=False)
     elif request.method == 'PUT':
         userData = JSONParser().parse(request)
