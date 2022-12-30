@@ -5,13 +5,13 @@ class User(models.Model):
     user_id = models.AutoField(primary_key=True)
     login = models.CharField(max_length=50)
     password = models.CharField(max_length=500)
-    token = models.CharField(max_length=500)
+    token = models.CharField(max_length=500, blank=False, null=False)
 
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True, unique=True, null=False)
     name = models.CharField(max_length=250)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, null=True, blank=True)
 
 
 class Product(models.Model):
