@@ -16,7 +16,7 @@ function Register() {
         const data = { login, password };
         try {
             const response = await axios.post('http://localhost:8000/users/', data);
-            localStorage.setItem('token', response.data);
+            localStorage.setItem('token', response.data.token);
             console.log(response.data);
             navigate('/');
         } catch (e) {

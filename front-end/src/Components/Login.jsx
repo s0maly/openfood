@@ -10,7 +10,6 @@ function Login() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
 
@@ -22,10 +21,8 @@ function Login() {
 
     try {
       const response = await axios.post('http://localhost:8000/login/', data);
-      setSuccess(response.data.success);
-      // setIsAuthenticated(true);
-      // console.log("la methode isAuth login page " , isAuthenticated);
-      // redirect to users page with appropriate id
+      // setSuccess(response.data.success);
+      localStorage.setItem('token', response.data.token.toString());
       navigate('/users/', { state: { id: response.data.id } })
       
       // navigate('/users');
@@ -49,8 +46,6 @@ function Login() {
           <input type="password" className="form-control" value={password} onChange={event => setPassword(event.target.value)} required />
         </div>
         <button type="submit" className="btn btn-primary mt-3">Connexion</button>
-        {error && <p>{error}</p>}
-        {success && <p>{success}</p>}
       </form>
     </div>
   );
@@ -59,7 +54,6 @@ function Login() {
     <div className="app">
       <div className="login-form">
         <div className="title">Connexion</div>
-        {/* {isAuthenticated && <Home isAuthenticated={isAuthenticated} />} */}
         {renderForm}
       </div>
     </div>

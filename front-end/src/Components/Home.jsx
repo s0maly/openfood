@@ -15,6 +15,7 @@ function Home() {
   const [openFoodFactUrl, setOpenFoodFactUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -25,30 +26,7 @@ function Home() {
     setQuery(event.target.value);
   }
 
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-
-  //   // Faire une requête à l'API openFoodFacts avec le code barre
-  //   axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${barcode}.json`)
-  //     .then((response) => {
-  //       // Mettre à jour le state avec le produit retourné par l'API
-  //       setProduct(response.data.product);
-
-  //       setProductName(response.data.product.product_name);
-  //       setDescription(response.data.product.ingredients_text);
-  //       setOpenFoodFactUrl(response.data.product.sources.url);
-  //       setImageUrl(response.data.product.image_front_url);
-  //       setBarcode(response.data.product._id)
-  //       setCategoryName(response.data.product.categories_hierarchy.pop());
-  //       setCategoryDescription(response.data.product.categories_hierarchy.pop());
-
-  //     })
-  //     .catch((error) => {
-  //       // Mettre à jour le state avec l'erreur
-  //       setError(error);
-  //     });
-  // }
-
+ 
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -114,36 +92,36 @@ function Home() {
 
 
 
-  // if (!isAuthenticated) {
-  //   console.log('home page not authenticated');
-  //   setTimeout(() => navigate('/login'), 0);
-  // } else {
-  //   console.log('home page authenticated');
-  // }
-
 
   const handleAddProduct = (event) => {
     let code = event.target.dataset.id;
     event.preventDefault();
 
-    console.log('product id ',code)
     axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${code}.json`)
       .then((response) => {
         // Mettre à jour le state avec le produit retourné par l'API
         setProduct(response.data.product);
+        console.log('token init',localStorage.getItem('token'));
+
+        setToken(localStorage.getItem('token').toString());
+        
+        console.log('token string : ',token);
+
         setProductName(response.data.product.product_name);
         setDescription(response.data.product.ingredients_text);
-        setOpenFoodFactUrl(response.data.product.sources.url);
+        setOpenFoodFactUrl(response.data.product.link);
         setImageUrl(response.data.product.image_front_url);
         setBarcode(response.data.product.code);
-
+    
         // sauvegarder le produit dans la base de données
         const products = {
           name: productName,
           description: description,
           code: barcode,
           url: openFoodFactUrl,
-          image_url: imageUrl
+          image_url: imageUrl,
+          token: token,
+          category: 'hello'
         }
         axios.post('http://localhost:8000/products/', products)
           .then((response) => {
