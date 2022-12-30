@@ -25,7 +25,10 @@ function Login() {
       setSuccess(response.data.success);
       // setIsAuthenticated(true);
       // console.log("la methode isAuth login page " , isAuthenticated);
-      navigate('/');
+      // redirect to users page with appropriate id
+      navigate('/users/', { state: { id: response.data.id } })
+      
+      // navigate('/users');
     } catch (e) {
       // console.log("la methode isAuth login page " , isAuthenticated);
       setError(e.response.data.error);
@@ -37,19 +40,17 @@ function Login() {
   const renderForm = (
     <div className="form">
       <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Email </label>
-          <input type="text" value={login} onChange={event => setEmail(event.target.value)} required />
+        <div className="form-group">
+          <label htmlFor="examail">Email</label>
+          <input type="email" className="form-control" value={login} onChange={event => setEmail(event.target.value)} required />
         </div>
-        <div className="input-container">
-          <label>Mot de passe </label>
-          <input type="password" value={password} onChange={event => setPassword(event.target.value)} required />
+        <div className="form-group">
+          <label htmlFor="password">Mot de passe</label>
+          <input type="password" className="form-control" value={password} onChange={event => setPassword(event.target.value)} required />
         </div>
-        <div className="button-container">
-          <button type="submit">Connexion</button>
-          {error && <p>{error}</p>}
-          {success && <p>{success}</p>}
-        </div>
+        <button type="submit" className="btn btn-primary mt-3">Connexion</button>
+        {error && <p>{error}</p>}
+        {success && <p>{success}</p>}
       </form>
     </div>
   );
