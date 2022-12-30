@@ -1,9 +1,8 @@
-import base64
 import time
 
+from django.contrib.auth.hashers import make_password, check_password
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.parsers import JSONParser
 
 from app.models import User, Product, Cart, Category
@@ -53,14 +52,44 @@ def userApi(request, id=0):
 @csrf_exempt
 def productApi(request, id=0):
     if request.method == 'GET':
-        products = Product.objects.all()
+        productData = JSONParser().parse(request)
+        user = User.objects.get(token=productData['token'])
+
+        user_cart = Cart.objects.filter(user_id=user['id'])
+        products = Product.objects.prefetch_related(
+            'cart_set'
+        ).filter(cart__in=user_cart)
         productsSerialized = ProductSerializer(products, many=True)
         return JsonResponse(productsSerialized.data, safe=False)
     elif request.method == 'POST':
         productData = JSONParser().parse(request)
-        productSerialized = ProductSerializer(data=productData)
+        user = User.objects.get(token=productData['token'])
+
+
+        category = {'name': productData['category']}
+        categorySerialized = CategorySerializer(data=category)
+        categorySerialized.is_valid()
+        categorySerialized.save()
+
+        lastCat = Category.objects.latest('category_id')
+
+        newProductData = {
+            'name': productData['name'],
+            'url': productData['url'],
+            'image_url': productData['image_url'],
+            'description': productData['description'],
+            'category_id': lastCat.category_id,
+            'code': productData['code']
+        }
+        productSerialized = ProductSerializer(data=newProductData)
         if productSerialized.is_valid():
             productSerialized.save()
+            lastProduct = Product.objects.latest('product_id')
+            cart = {'product_id': lastProduct.product_id, 'user': user.user_id}
+
+            cartSerialized = CartSerializer(data=cart)
+            if cartSerialized.is_valid():
+                cartSerialized.save()
             return JsonResponse('Success', safe=False)
         return JsonResponse('Failed', safe=False)
     elif request.method == 'PUT':
@@ -73,8 +102,10 @@ def productApi(request, id=0):
         return JsonResponse('Failed', safe=False)
     elif request.method == 'DELETE':
         productData = JSONParser().parse(request)
+        user = User.objects.get(token=productData['token'])
         product = Product.objects.get(product_id=productData['id'])
         product.delete()
+        Cart.objects.filter(user=user['id'], product_id=productData['id']).delete()
         return JsonResponse('Success', safe=False)
 
 
