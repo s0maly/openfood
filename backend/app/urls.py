@@ -12,7 +12,8 @@ urlpatterns = [
     re_path('carts/([0-9]+)$', views.cartApi),
 
     re_path('products', views.productApi),
-    re_path('products/([0-9]+)$', views.productApi),
+    #re_path('products?<str:token>', views.productApi),
+    re_path(r'^products/(?P<token>[\w\d\.]+)/$', views.productApi),
 
     re_path('login', views.loginApi),
 ]
