@@ -50,10 +50,14 @@ def userApi(request, id=0):
 
 
 @csrf_exempt
-def productApi(request, id=0):
+def productApi(request, token="0"):
     if request.method == 'GET':
-        productData = JSONParser().parse(request)
-        user = User.objects.get(token=productData['token'])
+        #productData = JSONParser().parse(request)
+
+        token = request.path.rstrip('/').lstrip('/').split('/')[1]
+        print("******************")
+        print(token)
+        user = User.objects.get(token=token)
 
         user_cart = Cart.objects.filter(user_id=user.user_id)
         products = Product.objects.prefetch_related(
