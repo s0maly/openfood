@@ -32,7 +32,7 @@ def userApi(request, id=0):
         userSerialized = UserSerializer(data=userData)
         if userSerialized.is_valid():
             userSerialized.save()
-            return JsonResponse('{token:' + userData['token'] + '}', safe=False)
+            return JsonResponse({"token": userData['token']}, safe=False)
         return JsonResponse('Failed', safe=False)
     elif request.method == 'PUT':
         userData = JSONParser().parse(request)
@@ -64,7 +64,6 @@ def productApi(request, id=0):
     elif request.method == 'POST':
         productData = JSONParser().parse(request)
         user = User.objects.get(token=productData['token'])
-
 
         category = {'name': productData['category']}
         categorySerialized = CategorySerializer(data=category)
@@ -170,5 +169,5 @@ def loginApi(request, id=0):
     userData = JSONParser().parse(request)
     user = User.objects.get(login=userData['login'])
     if check_password(userData['password'], user.password):
-        return JsonResponse('Success', safe=False)
+        return JsonResponse({"token": user.token}, safe=False)
     return JsonResponse('Failed', safe=False)
