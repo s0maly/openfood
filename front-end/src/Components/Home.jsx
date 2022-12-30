@@ -96,7 +96,7 @@ function Home() {
           <div className="card-header">
             <img src={product.image_thumb_url} alt="hover" />
           </div>
-          <button className="btn btn-warning" onClick={handleAddProduct}>Ajouter au favoris</button>
+          <button className="btn btn-warning" onClick={handleAddProduct} data-id={product.code}>Ajouter au favoris</button>
           <div className="card-body">
             <span className='tag tag-teal'>{product.product_name}</span>
             <h4>{product.brands}</h4>
@@ -122,10 +122,12 @@ function Home() {
   // }
 
 
-  const handleAddProduct = (e) => {
-    e.preventDefault();
-    console.log('product id ',product.code)
-    axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${product.code}.json`)
+  const handleAddProduct = (event) => {
+    let code = event.target.dataset.id;
+    event.preventDefault();
+
+    console.log('product id ',code)
+    axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${code}.json`)
       .then((response) => {
         // Mettre à jour le state avec le produit retourné par l'API
         setProduct(response.data.product);

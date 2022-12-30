@@ -7,18 +7,17 @@ import "./style.css";
 function Register() {
     const [login, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [token, setToken] = useState("");
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
 
 
     async function handleSubmit(e) {
         e.preventDefault();
-        const data = { login, password, token };
+        const data = { login, password };
         try {
             const response = await axios.post('http://localhost:8000/users/', data);
-            setSuccess(response.data.success);
+            localStorage.setItem('token', response.data);
+            console.log(response.data);
             navigate('/');
         } catch (e) {
             setError(e.response.data.error);
@@ -40,8 +39,6 @@ function Register() {
                             <input type="password" className="form-control" value={password} onChange={event => setPassword(event.target.value)} required />
                         </div>
                         <button type="submit" className="btn btn-primary mt-3">Inscription</button>
-                        {error && <p>{error}</p>}
-                        {success && <p>{success}</p>}
                     </form>
                 </div>
             </div>

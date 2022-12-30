@@ -19,7 +19,7 @@ class Product(models.Model):
     name = models.CharField(max_length=250)
     description = models.CharField(max_length=500)
     code = models.CharField(max_length=50)
-    url = models.CharField(max_length=500)
+    url = models.CharField(null=True, max_length=500)
     image_url = models.CharField(max_length=500)
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
 
