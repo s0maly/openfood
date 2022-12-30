@@ -170,5 +170,5 @@ def loginApi(request, id=0):
     userData = JSONParser().parse(request)
     user = User.objects.get(login=userData['login'])
     if check_password(userData['password'], user.password):
-        return JsonResponse('Success', safe=False)
+        return JsonResponse({"token":user.token}, safe=False)
     return JsonResponse('Failed', safe=False)
