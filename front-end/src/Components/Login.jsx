@@ -23,9 +23,7 @@ function Login() {
       const response = await axios.post('http://localhost:8000/login/', data);
       // setSuccess(response.data.success);
       localStorage.setItem('token', response.data.token.toString());
-      navigate('/users/', { state: { id: response.data.id } })
-      
-      // navigate('/users');
+      navigate('/');
     } catch (e) {
       // console.log("la methode isAuth login page " , isAuthenticated);
       setError(e.response.data.error);

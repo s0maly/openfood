@@ -78,7 +78,7 @@ function Home() {
           <div className="card-body">
             <span className='tag tag-teal'>{product.product_name}</span>
             <h4>{product.brands}</h4>
-            <span><strong>Ingredients :</strong><br />{product.ingredients_text.slice(0,100)}</span>
+            <span><strong>Ingredients :</strong><br />{product.ingredients_text}</span>
             <span><br /><strong>Energy : </strong>{product.nutriments.energy_serving} calories</span>
             <span><strong>Nutri-Score : </strong>{product.nutriscore_grade}</span>
             <span><strong>Magasins :</strong></span>

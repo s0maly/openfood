@@ -63,7 +63,7 @@ def productApi(request, id=0):
         return JsonResponse(productsSerialized.data, safe=False)
     elif request.method == 'POST':
         productData = JSONParser().parse(request)
-        user = User.objects.get(token=str(productData['token']))
+        user = User.objects.get(token=productData['token'])
 
         print("*************************************************")
         print(user.user_id, user.token, user.login)
