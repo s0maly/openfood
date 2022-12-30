@@ -55,7 +55,7 @@ def productApi(request, id=0):
         productData = JSONParser().parse(request)
         user = User.objects.get(token=productData['token'])
 
-        user_cart = Cart.objects.filter(user_id=user['id'])
+        user_cart = Cart.objects.filter(user_id=user.user_id)
         products = Product.objects.prefetch_related(
             'cart_set'
         ).filter(cart__in=user_cart)
@@ -64,6 +64,9 @@ def productApi(request, id=0):
     elif request.method == 'POST':
         productData = JSONParser().parse(request)
         user = User.objects.get(token=productData['token'])
+
+        print("*************************************************")
+        print(user.user_id, user.token, user.login)
 
         category = {'name': productData['category']}
         categorySerialized = CategorySerializer(data=category)
