@@ -7,6 +7,7 @@ import "./style.css";
 function Register() {
     const [login, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [token, setToken] = useState("");
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
@@ -14,11 +15,11 @@ function Register() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        const data = { login, password };
+        const data = { login, password, token };
         try {
             const response = await axios.post('http://localhost:8000/users/', data);
             setSuccess(response.data.success);
-            setTimeout(() => navigate('/'), 0);
+            navigate('/');
         } catch (e) {
             setError(e.response.data.error);
         }
@@ -30,22 +31,18 @@ function Register() {
                 <div className="title">Inscription</div>
                 <div className="form">
                     <form onSubmit={handleSubmit}>
-                        <div className="input-container">
-                            <label type="email">Email</label>
-                            <input value={login} onChange={(e) => setEmail(e.target.value)} type="text" id="email" name="email" />
+                        <div className="form-group">
+                            <label htmlFor="examail">Email</label>
+                            <input type="email" className="form-control" value={login} onChange={event => setEmail(event.target.value)} required />
                         </div>
-                        <div className="input-container">
-                            <label type="password">Mot de passe</label>
-                            <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="********" id="password" name="password" />
+                        <div className="form-group">
+                            <label htmlFor="password">Mot de passe</label>
+                            <input type="password" className="form-control" value={password} onChange={event => setPassword(event.target.value)} required />
                         </div>
-                        <br />
-                        <div className='button-container'>
-                            <button type="submit">Inscription</button>
-                            {error && <p>{error}</p>}
-                            {success && <p>{success}</p>}
-                        </div>
+                        <button type="submit" className="btn btn-primary mt-3">Inscription</button>
+                        {error && <p>{error}</p>}
+                        {success && <p>{success}</p>}
                     </form>
-
                 </div>
             </div>
         </div>

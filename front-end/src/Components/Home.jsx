@@ -5,35 +5,61 @@ import "./style.css"
 
 
 function Home() {
-  
+
   const [barcode, setBarcode] = useState('');
   const [product, setProduct] = useState(null);
-  const [error, setError] = useState(null);
-
+  const [categoryName, setCategoryName] = useState('');
+  const [categoryDescription, setCategoryDescription] = useState('');
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [openFoodFactUrl, setOpenFoodFactUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [error, setError] = useState(null);
+
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
 
   const navigate = useNavigate();
 
   const handleChange = (event) => {
-    setBarcode(event.target.value);
+    setQuery(event.target.value);
   }
+
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+
+  //   // Faire une requête à l'API openFoodFacts avec le code barre
+  //   axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${barcode}.json`)
+  //     .then((response) => {
+  //       // Mettre à jour le state avec le produit retourné par l'API
+  //       setProduct(response.data.product);
+
+  //       setProductName(response.data.product.product_name);
+  //       setDescription(response.data.product.ingredients_text);
+  //       setOpenFoodFactUrl(response.data.product.sources.url);
+  //       setImageUrl(response.data.product.image_front_url);
+  //       setBarcode(response.data.product._id)
+  //       setCategoryName(response.data.product.categories_hierarchy.pop());
+  //       setCategoryDescription(response.data.product.categories_hierarchy.pop());
+
+  //     })
+  //     .catch((error) => {
+  //       // Mettre à jour le state avec l'erreur
+  //       setError(error);
+  //     });
+  // }
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Faire une requête à l'API openFoodFacts avec le code barre
-    axios.get(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
+
+    // Faire une requête à l'API openFoodFacts avec la requête
+    axios.get(`https://fr.world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&json=1`)
       .then((response) => {
-        // Mettre à jour le state avec le produit retourné par l'API
-        setProduct(response.data.product);
-        setProductName(response.data.product.product_name);
-        setDescription(response.data.product.ingredients_text);
-        setOpenFoodFactUrl(response.data.product.url);
-        setImageUrl(response.data.product.image_front_url);
-        setBarcode(response.data.product._id);
+        console.log('response', response.data.products)
+        // Mettre à jour le state avec les résultats de la requête
+        setResults(response.data.products);
+
       })
       .catch((error) => {
         // Mettre à jour le state avec l'erreur
@@ -41,17 +67,17 @@ function Home() {
       });
   }
 
-  // sauvegarder le produit dans la base de données
-  const handleAddProduct = (e) => {
+
+
+
+  // ajouter la categorie dans la base de données
+  const handleAddCategory = (e) => {
     e.preventDefault();
-    const product = {
-      code: barcode,
-      name: productName,
-      description: description,
-      url : openFoodFactUrl,
-      image_url: imageUrl
+    const categories = {
+      name: categoryName,
+      description: categoryDescription,
     }
-    axios.post('http://localhost:3000/products/', product)
+    axios.post('http://localhost:8000/categories/', categories)
       .then((response) => {
         console.log(response);
       })
@@ -60,30 +86,33 @@ function Home() {
       });
   }
 
+
+
   const ProductCard = ({ product }) => {
     // Afficher les informations du produit dans une carte
     return (
-      <div className="container">
-        <h2>Product info</h2>
+      <div className="col-md-4">
         <div className="card">
           <div className="card-header">
-            <img src={product.image_front_url} alt="hover" />
-            <button className="btn btn-primary">Ajouter au panier</button>
+            <img src={product.image_thumb_url} alt="hover" />
           </div>
+          <button className="btn btn-warning" onClick={handleAddProduct}>Ajouter au favoris</button>
           <div className="card-body">
             <span className='tag tag-teal'>{product.product_name}</span>
             <h4>{product.brands}</h4>
-            <span>Energy : {product.nutriments.energy_serving} calories</span>
-            <span>Nutri-Score : {product.nutriscore_grade}</span>
-            <div>
-              <span>Stores :</span>
-              <p>{product.stores}</p>
-            </div>
+            <span><strong>Ingredients :</strong><br />{product.ingredients_text.slice(0,100)}</span>
+            <span><br /><strong>Energy : </strong>{product.nutriments.energy_serving} calories</span>
+            <span><strong>Nutri-Score : </strong>{product.nutriscore_grade}</span>
+            <span><strong>Magasins :</strong></span>
+            <p>{product.stores_tags[0]}</p>
+            <button className="btn btn-primary" onClick={() => navigate(`/product/${product._id}`)}>Voir plus</button>
           </div>
         </div>
       </div>
     );
   }
+
+
 
   // if (!isAuthenticated) {
   //   console.log('home page not authenticated');
@@ -93,22 +122,64 @@ function Home() {
   // }
 
 
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    console.log('product id ',product.code)
+    axios.get(`https://fr.world.openfoodfacts.org/api/v0/product/${product.code}.json`)
+      .then((response) => {
+        // Mettre à jour le state avec le produit retourné par l'API
+        setProduct(response.data.product);
+        setProductName(response.data.product.product_name);
+        setDescription(response.data.product.ingredients_text);
+        setOpenFoodFactUrl(response.data.product.sources.url);
+        setImageUrl(response.data.product.image_front_url);
+        setBarcode(response.data.product.code);
 
+        // sauvegarder le produit dans la base de données
+        const products = {
+          name: productName,
+          description: description,
+          code: barcode,
+          url: openFoodFactUrl,
+          image_url: imageUrl
+        }
+        axios.post('http://localhost:8000/products/', products)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        // Mettre à jour le state avec l'erreur
+        setError(error);
+      });
+  }
 
   return (
     <div className="container">
-      <form onSubmit={handleSubmit}>
-      <label>
-          Code barre :
-          <input type="text" value={barcode} onChange={handleChange} />
-        </label>
-        <button type="submit">Rechercher</button>
-        {console.log(product)}
-        {error && <p>{error.message}</p>}
-        {product && <ProductCard product={product} />}
+      <form className='form-inline' onSubmit={handleSubmit}>
+        <div >
+          <label >
+            <input className='form-control mr-sm-2' type="text" value={query} onChange={handleChange} placeholder='Recherche' />
+          </label>
+          <button type="submit" className='btn btn-secondary'>Rechercher</button>
+        </div>
       </form>
+
+      {error && <p>{error.message}</p>}
+      {results.length > 0 && (
+        <div className='container-fluid d-flex justify-content-center'>
+          <div className='row'>
+            {results.map((product) => (
+              <ProductCard key={product.code} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-    
+
   );
 
 }
